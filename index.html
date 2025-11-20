@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Al-Quran Digital</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a5e63 0%, #0d2e36 100%);
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        h1 {
+            color: #1a5e63;
+            margin-bottom: 10px;
+            font-size: 2.5rem;
+            font-weight: 600;
+        }
+        
+        .subtitle {
+            color: #4a7c7f;
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        .quran-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: #1a5e63;
+        }
+        
+        .bismillah {
+            font-family: 'Times New Roman', serif;
+            font-size: 2.2rem;
+            text-align: center;
+            margin: 20px 0;
+            color: #1a5e63;
+            direction: rtl;
+        }
+        
+        .cards-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            padding: 20px;
+            transition: all 0.4s ease;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+            cursor: pointer;
+        }
+        
+        .card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, #1a5e63, #4a7c7f);
+        }
+        
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e8f4f5;
+        }
+        
+        .surah-number {
+            background: #1a5e63;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        
+        .surah-name {
+            font-size: 1.4rem;
+            color: #1a5e63;
+            font-weight: 600;
+            text-align: right;
+            flex-grow: 1;
+            margin: 0 15px;
+        }
+        
+        .surah-name-arabic {
+            font-family: 'Times New Roman', serif;
+            font-size: 1.6rem;
+            direction: rtl;
+        }
+        
+        .card-body {
+            margin-bottom: 15px;
+            flex-grow: 1;
+        }
+        
+        .surah-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+            color: #4a7c7f;
+        }
+        
+        .surah-details {
+            color: #555;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+        
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid #e8f4f5;
+            padding-top: 15px;
+            margin-top: auto;
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 8px 16px;
+            background-color: #1a5e63;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            transition: background-color 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .btn:hover {
+            background-color: #0d2e36;
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #1a5e63;
+            color: #1a5e63;
+        }
+        
+        .btn-outline:hover {
+            background: #1a5e63;
+            color: white;
+        }
+        
+        .type-badge {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .type-makkiyah {
+            background-color: #e8f4f5;
+            color: #1a5e63;
+        }
+        
+        .type-madaniyah {
+            background-color: #f0f7e6;
+            color: #5a7c1a;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 30px;
+            color: white;
+            font-size: 1.2rem;
+        }
+        
+        .error {
+            text-align: center;
+            padding: 30px;
+            color: #ff6b6b;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        
+        /* Desktop - 4 cards per row */
+        @media (min-width: 1200px) {
+            .card {
+                flex: 1 1 calc(25% - 20px);
+                max-width: calc(25% - 20px);
+            }
+        }
+        
+        /* Tablet - 2 cards per row */
+        @media (max-width: 1199px) and (min-width: 768px) {
+            .card {
+                flex: 1 1 calc(50% - 20px);
+                max-width: calc(50% - 20px);
+            }
+        }
+        
+        /* Mobile - 1 card per row */
+        @media (max-width: 767px) {
+            .card {
+                flex: 1 1 100%;
+                max-width: 100%;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .surah-name {
+                font-size: 1.2rem;
+            }
+            
+            .surah-name-arabic {
+                font-size: 1.4rem;
+            }
+        }
+        
+        .filter-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .filter-btn {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid #ddd;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .filter-btn:hover, .filter-btn.active {
+            background: #1a5e63;
+            color: white;
+            border-color: #1a5e63;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            padding: 20px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+        }
+        
+        .search-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .search-box {
+            padding: 12px 20px;
+            width: 100%;
+            max-width: 500px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .search-box:focus {
+            outline: none;
+            box-shadow: 0 4px 15px rgba(26, 94, 99, 0.3);
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .stat-card {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 15px 25px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #1a5e63;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: #4a7c7f;
+        }
+        
+        /* CSS untuk tampilan ayat */
+        .ayat-container {
+            margin-top: 20px;
+        }
+        
+        .ayat-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 4px solid #1a5e63;
+            transition: all 0.3s ease;
+        }
+        
+        .ayat-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        .ayat-number {
+            background: #1a5e63;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        
+        .ayat-arabic {
+            font-size: 22px;
+            direction: rtl;
+            text-align: right;
+            line-height: 1.8;
+            margin: 15px 0;
+            font-family: 'Times New Roman', serif;
+        }
+        
+        .ayat-translation {
+            font-style: italic;
+            color: #555;
+            line-height: 1.6;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        .back-button {
+            margin-top: 20px;
+            padding: 10px 15px;
+            background-color: #1a5e63;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+        }
+        
+        .back-button:hover {
+            background-color: #0d2e36;
+        }
+        
+        .surah-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e0e0e0;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .surah-title {
+            color: #1a5e63;
+            margin-bottom: 10px;
+        }
+        
+        .surah-meta {
+            color: #666;
+            font-size: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="quran-icon"><i class="fas fa-quran"></i></div>
+            <h1>Al-Quran Digital</h1>
+            <p class="subtitle">Baca dan pelajari Al-Quran dengan mudah. Klik pada surah untuk melihat detail ayat.</p>
+            
+            <div class="bismillah">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>
+        </header>
+        
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number">114</div>
+                <div class="stat-label">Surah</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">6,236</div>
+                <div class="stat-label">Ayat</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">30</div>
+                <div class="stat-label">Juz</div>
+            </div>
+        </div>
+        
+        <div class="search-container">
+            <input type="text" class="search-box" id="searchInput" placeholder="Cari surah...">
+        </div>
+        
+        <div class="filter-container">
+            <button class="filter-btn active" data-filter="all">Semua Surah</button>
+            <button class="filter-btn" data-filter="makkiyah">Makkiyah</button>
+            <button class="filter-btn" data-filter="madaniyah">Madaniyah</button>
+        </div>
+        
+        <div id="konten" class="loading">
+            <i class="fas fa-spinner fa-spin"></i> Memuat daftar surah...
+        </div>
+    </div>
+
+    <footer>
+        <p>Dibuat dengan ❤️ untuk mempelajari Al-Quran | Data dari API open-api.my.id</p>
+    </footer>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            tampilkanDaftarSurah();
+            
+            // Filter functionality
+            document.querySelectorAll('.filter-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    // Remove active class from all buttons
+                    document.querySelectorAll('.filter-btn').forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+                    
+                    // Add active class to clicked button
+                    this.classList.add('active');
+                    
+                    // Filter cards
+                    const filter = this.getAttribute('data-filter');
+                    filterCards(filter);
+                });
+            });
+            
+            // Search functionality
+            document.getElementById('searchInput').addEventListener('input', function() {
+                filterBySearch(this.value);
+            });
+        });
+
+        let allSurahs = [];
+
+        async function tampilkanDaftarSurah() {
+            try {
+                const response = await fetch('https://open-api.my.id/api/quran/surah');
+                
+                if (!response.ok) {
+                    throw new Error('Gagal mengambil data surah');
+                }
+                
+                const data = await response.json();
+                
+                if (!data || data.length === 0) {
+                    throw new Error('Data surah tidak ditemukan');
+                }
+                
+                allSurahs = data;
+                renderSurahCards(data);
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('konten').innerHTML = `
+                    <div class="error">
+                        <h3>Terjadi Kesalahan</h3>
+                        <p>${error.message}</p>
+                        <button class="btn" onclick="tampilkanDaftarSurah()">Coba Lagi</button>
+                    </div>
+                `;
+            }
+        }
+
+        function renderSurahCards(surahs) {
+            let html = '<h2 style="text-align:center; color:white; margin-bottom:20px;">Daftar Surah</h2><div class="cards-container">';
+            
+            surahs.forEach(surah => {
+                const typeClass = surah.tempat_turun === 'Makkiyah' ? 'type-makkiyah' : 'type-madaniyah';
+                
+                html += `
+                    <div class="card" data-type="${surah.tempat_turun.toLowerCase()}" onclick="tampilkanAyat(${surah.nomor})">
+                        <div class="card-header">
+                            <div class="surah-number">${surah.nomor}</div>
+                            <div class="surah-name">
+                                ${surah.nama_latin}
+                                <div class="surah-name-arabic">${surah.nama}</div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="surah-info">
+                                <span>${surah.jumlah_ayat} Ayat</span>
+                                <span class="type-badge ${typeClass}">${surah.tempat_turun}</span>
+                            </div>
+                            <div class="surah-details">
+                                <p><strong>Arti:</strong> ${surah.arti}</p>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <span><i class="fas fa-eye"></i> Klik untuk detail</span>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+            document.getElementById('konten').innerHTML = html;
+        }
+
+        function filterCards(filter) {
+            const cards = document.querySelectorAll('.card');
+            
+            cards.forEach(card => {
+                if (filter === 'all' || card.getAttribute('data-type') === filter) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        function filterBySearch(searchTerm) {
+            const filteredSurahs = allSurahs.filter(surah => {
+                return (
+                    surah.nama_latin.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    surah.nama.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    surah.arti.toLowerCase().includes(searchTerm.toLowerCase())
+                );
+            });
+            
+            renderSurahCards(filteredSurahs);
+        }
+
+        async function tampilkanAyat(nosurah) {
+            try {
+                document.getElementById('konten').innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Memuat ayat...</div>';
+                
+                const response = await fetch(`https://open-api.my.id/api/quran/surah/${nosurah}`);
+                
+                if (!response.ok) {
+                    throw new Error('Gagal mengambil data ayat');
+                }
+                
+                const data = await response.json();
+                
+                if (!data || !data.ayat) {
+                    throw new Error('Data ayat tidak ditemukan');
+                }
+                
+                renderAyatCards(data);
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('konten').innerHTML = `
+                    <div class="error">
+                        <h3>Terjadi Kesalahan</h3>
+                        <p>${error.message}</p>
+                        <button onclick="tampilkanDaftarSurah()" class="back-button">Kembali ke Daftar Surah</button>
+                    </div>
+                `;
+            }
+        }
+
+        function renderAyatCards(surah) {
+            let html = `
+                <div class="surah-header">
+                    <h2 class="surah-title">${surah.nama} (${surah.nama_latin})</h2>
+                    <p class="surah-meta">${surah.jumlah_ayat} Ayat • ${surah.tempat_turun} • Arti: ${surah.arti}</p>
+                </div>
+                <div class="ayat-container">
+            `;
+            
+            surah.ayat.forEach(ayat => {
+                html += `
+                    <div class="ayat-card">
+                        <div class="ayat-number">${ayat.nomor}</div>
+                        <div class="ayat-arabic">${ayat.ar}</div>
+                        <div class="ayat-translation">${ayat.tr}</div>
+                    </div>
+                `;
+            });
+            
+            html += `
+                </div>
+                <button onclick="tampilkanDaftarSurah()" class="back-button">Kembali ke Daftar Surah</button>
+            `;
+            
+            document.getElementById('konten').innerHTML = html;
+        }
+    </script>
+</body>
+</html>
